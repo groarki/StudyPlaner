@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Task } from '../types';
+import type { Task } from '../types';
 
 interface TasksState {
   tasks: Task[];

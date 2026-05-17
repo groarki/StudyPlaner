@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { HelpfulLink } from '../types';
+import type { HelpfulLink } from '../types';
 
 interface ProfileState {
   name: string;

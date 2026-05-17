@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Lecture } from '../types';
+import type { Lecture } from '../types';
 
 interface LecturesState {
   lectures: Lecture[];
