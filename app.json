@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "StudyPlaner",
+    "slug": "StudyPlaner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "studyplaner",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6B8F71"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourname.studyplaner"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#6B8F71",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.yourname.studyplaner"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow StudyPlaner to access your photos.",
+          "cameraPermission": "Allow StudyPlaner to use your camera."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#6B8F71"
+        }
+      ]
+    ]
+  }
+}
