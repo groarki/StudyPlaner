@@ -6,6 +6,7 @@ export const Colors = {
     timeText: '#0088FF',
     selectedTimeText: '#FC3C2B',
     error: '#E07070',
+    border: '#B0B0B0',
   
     Yellow: '#F1EEB9',
     Blue: '#DFEEF1',
@@ -16,18 +17,18 @@ export const Colors = {
 };
 
 export const Spacing = {
-    xs: 4,
-    sm: 8,
+    xs: 8,
+    sm: 12,
     md: 16,
     lg: 24,
     xl: 32,
 };
 
 export const FontSize = {
-    sm: 12,
-    md: 14,
-    lg: 16,
-    xl: 20,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 22,
     xxl: 28,
 };
 
@@ -37,3 +38,5 @@ export const BorderRadius = {
     lg: 16,
     xl: 24,
 };
+
+export const SCREEN_PADDING = 16

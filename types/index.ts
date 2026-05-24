@@ -13,10 +13,23 @@ export interface Lecture {
   dayOfWeek: number; 
   startTime: string; 
   endTime: string;   
-  color: string;
+  color?: string;
   notes?: string;
   alertMinutes?: number; 
   createdAt: string;
+}
+
+export interface LectureDbRow {
+  id: string;
+  user_id: string;
+  title: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  color?: string | null;
+  notes?: string | null;
+  alert_minutes?: number | null;
+  created_at: string;
 }
 
 export interface Task {
