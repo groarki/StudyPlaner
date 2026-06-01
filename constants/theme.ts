@@ -3,8 +3,6 @@ export const Colors = {
     background: '#FFFFFF',
     text: '#1A1A1A',
     textSecondary: '#969696',
-    timeText: '#0088FF',
-    selectedTimeText: '#FC3C2B',
     error: '#E07070',
     border: '#B0B0B0',
   

@@ -188,7 +188,7 @@ export default function TabsLayout() {
                   <TouchableOpacity
                     style={[styles.optionCard, styles.taskCard]}
                     activeOpacity={0.85}
-                    onPress={() => navigateFromAddModal('/(tabs)/tasks')}
+                    onPress={() => navigateFromAddModal('/add-task')}
                   >
                     <BookMarked size={57} color={Colors.text} strokeWidth={1} />
                     <Text style={styles.optionText}>Add task</Text>

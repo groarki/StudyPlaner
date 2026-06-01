@@ -9,15 +9,16 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Picker } from '@react-native-picker/picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, ChevronDown } from 'lucide-react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { supabase } from '../../lib/supabase';
 import { Colors, FontSize, Spacing, BorderRadius, SCREEN_PADDING } from '../../constants/theme';
 import { DAYS, ALERT_OPTIONS } from '../../constants/options';
 import ColorPicker from '../ui/color-picker';
 import BottomSheetModal from '../ui/bottom-sheet-modal';
+import DayPickerContent from '../ui/modal-contents/day-picker-content';
+import AlertOptionsContent from '../ui/modal-contents/alert-options-content';
+import DateTimeConfirmContent from '../ui/modal-contents/date-time-confirm-content';
 import { formatTime, mapLectureFromDb } from '../../utils';
 import { Lecture, LectureDbRow } from '../../types';
 import { useLecturesStore } from '../../store';
@@ -260,10 +261,7 @@ export default function AddLectureForm() {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.colorRow}>
-          <Text style={styles.label}>Color</Text>
-          <ColorPicker selectedColor={color} onSelectColor={setColor} />
-        </View>
+        <ColorPicker selectedColor={color} onSelectColor={setColor} />
 
         <TextInput
           style={styles.notesInput}
@@ -307,25 +305,12 @@ export default function AddLectureForm() {
         title="Select day"
         onClose={closeModal}
       >
-        <View style={styles.dayPickerWrapper}>
-          <Picker
-            selectedValue={dayOfWeek}
-            onValueChange={(val) => {
-              setDayOfWeek(val);
-            }}
-            style={styles.picker}
-          >
-            {DAYS.map((d) => (
-              <Picker.Item key={d.value} label={d.label} value={d.value} />
-            ))}
-          </Picker>
-        </View>
-        <TouchableOpacity
-          style={styles.confirmButton}
-          onPress={closeModal}
-        >
-          <Text style={styles.confirmButtonText}>Confirm</Text>
-        </TouchableOpacity>
+        <DayPickerContent
+          options={DAYS}
+          selectedValue={dayOfWeek}
+          onValueChange={setDayOfWeek}
+          onConfirm={closeModal}
+        />
       </BottomSheetModal>
 
       <BottomSheetModal
@@ -333,23 +318,14 @@ export default function AddLectureForm() {
         title="Alert"
         onClose={closeModal}
       >
-        {ALERT_OPTIONS.map((opt) => (
-          <TouchableOpacity
-            key={String(opt.value)}
-            style={[styles.option, alertMinutes === opt.value && styles.optionSelected]}
-            onPress={() => {
-              setAlertMinutes(opt.value);
-              closeModal();
-            }}
-          >
-            <Text style={[
-              styles.optionText,
-              alertMinutes === opt.value && styles.optionTextSelected,
-            ]}>
-              {opt.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        <AlertOptionsContent
+          options={ALERT_OPTIONS}
+          selectedValue={alertMinutes}
+          onSelect={(value) => {
+            setAlertMinutes(value);
+            closeModal();
+          }}
+        />
       </BottomSheetModal>
 
       <BottomSheetModal
@@ -357,19 +333,7 @@ export default function AddLectureForm() {
         title={timeModalTitle}
         onClose={closeModal}
       >
-        <DateTimePicker
-          value={tempTime}
-          mode="time"
-          display="spinner"
-          onChange={(_, date) => { if (date) setTempTime(date); }}
-          style={styles.timePicker}
-        />
-        <TouchableOpacity
-          style={styles.confirmButton}
-          onPress={handleConfirmTime}
-        >
-          <Text style={styles.confirmButtonText}>Confirm</Text>
-        </TouchableOpacity>
+        <DateTimeConfirmContent value={tempTime} mode="time" onChange={setTempTime} onConfirm={handleConfirmTime} />
       </BottomSheetModal>
     </SafeAreaView>
   );
@@ -473,15 +437,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: '600',
   },
-  colorRow: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 4,
-    marginBottom: Spacing.md,
-    gap: Spacing.sm,
-  },
   label: {
     fontSize: FontSize.md,
     color: Colors.text,
@@ -512,45 +467,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: Colors.background,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
-  },
-  option: {
-    paddingVertical: Spacing.sm + 2,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.md,
-  },
-  optionSelected: {
-    backgroundColor: Colors.Blue,
-  },
-  optionText: {
-    fontSize: FontSize.md,
-    color: Colors.text,
-  },
-  optionTextSelected: {
-    color: Colors.primary,
-    fontWeight: '600',
-  },
-  timePicker: {
-    width: '100%',
-  },
-  dayPickerWrapper: {
-    borderRadius: BorderRadius.md,
-    overflow: 'hidden',
-  },
-  picker: {
-    width: '100%',
-    color: Colors.text,
-  },
-  confirmButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-    marginTop: Spacing.sm,
-  },
-  confirmButtonText: {
     color: Colors.background,
     fontSize: FontSize.lg,
     fontWeight: '600',

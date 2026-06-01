@@ -38,11 +38,26 @@ export interface Task {
   title: string;
   dueDate: string; 
   dueTime: string;
+  color?: string;
   notes?: string;
   alertMinutes?: number;
   isCompleted: boolean;
   fileUrls?: string[];
   createdAt: string;
+}
+
+export interface TaskDbRow {
+  id: string;
+  user_id: string;
+  title: string;
+  due_date: string;
+  due_time: string;
+  color?: string | null;
+  notes?: string | null;
+  alert_minutes?: number | null;
+  is_completed: boolean;
+  file_urls?: string[] | null;
+  created_at: string;
 }
 
 export interface HelpfulLink {

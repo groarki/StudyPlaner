@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Modal, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { Modal, TouchableOpacity, View, Text, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Colors, BorderRadius, Spacing, FontSize } from '../../constants/theme';
 
 type BottomSheetModalProps = {
@@ -7,9 +7,16 @@ type BottomSheetModalProps = {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  contentStyle?: StyleProp<ViewStyle>;
 };
 
-export default function BottomSheetModal({ visible, title, onClose, children }: BottomSheetModalProps) {
+export default function BottomSheetModal({
+  visible,
+  title,
+  onClose,
+  children,
+  contentStyle,
+}: BottomSheetModalProps) {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <TouchableOpacity
@@ -18,7 +25,7 @@ export default function BottomSheetModal({ visible, title, onClose, children }: 
         onPress={onClose}
       >
         <TouchableOpacity activeOpacity={1} onPress={() => {}}>
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, contentStyle]}>
             <Text style={styles.modalTitle}>{title}</Text>
             {children}
           </View>
