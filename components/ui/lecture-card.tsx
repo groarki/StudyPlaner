@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     gap: Spacing.md,
-    minHeight: 110,
+    minHeight: 100,
+    width: 298
   },
   upperInfo: {
     flexDirection: 'row',
