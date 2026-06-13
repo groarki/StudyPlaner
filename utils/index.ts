@@ -1,25 +1,21 @@
-import { Lecture, LectureDbRow, Task, TaskDbRow } from '../types';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
-export function mapLectureFromDb(row: LectureDbRow): Lecture {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    title: row.title,
-    dayOfWeek: row.day_of_week,
-    startTime: row.start_time,
-    endTime: row.end_time,
-    color: row.color ?? undefined,
-    notes: row.notes ?? undefined,
-    alertMinutes: row.alert_minutes ?? undefined,
-    createdAt: row.created_at,
-  };
-}
+export type DateTimePickerMode = 'date' | 'time' | 'datetime';
+export type AndroidDateTimePickerMode = 'date' | 'time';
 
 export function formatTime(date: Date): string {
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
 
   return `${hours}:${minutes}`;
+}
+//formatting for task due time display in btn before opening
+export function formatDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  });
 }
 
 export function formatDateForCalendar(date: Date): string {
@@ -30,35 +26,64 @@ export function formatDateForCalendar(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatDueDate(value: string): string {
-  const date = new Date(value);
-  if (!Number.isNaN(date.getTime())) {
-    const day = `${date.getDate()}`.padStart(2, '0');
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    return `${day}.${month}`;
-  }
+// picking new date and displaing it by changing month/day/year
+export function mergeDatePart(current: Date, picked: Date): Date {
+  const next = new Date(current);
+  next.setFullYear(picked.getFullYear(), picked.getMonth(), picked.getDate());
+  return next;
+}
 
-  const parts = value.split(/[./-]/).filter(Boolean);
-  if (parts.length === 3) {
-    const [a, b] = parts;
-    return `${a.padStart(2, '0')}.${b.padStart(2, '0')}`;
+//new date by changing time from curr date 
+export function mergeTimePart(current: Date, picked: Date): Date {
+  const next = new Date(current);
+  next.setHours(picked.getHours(), picked.getMinutes(), 0, 0);
+  return next;
+}
+
+type OpenAndroidDateTimePickerParams = {
+  value: Date;
+  mode: DateTimePickerMode;
+  pickerMode: AndroidDateTimePickerMode;
+  onChange: (next: Date) => void;
+};
+
+export function openAndroidDateTimePicker({
+  value,
+  mode,
+  pickerMode,
+  onChange,
+}: OpenAndroidDateTimePickerParams): void {
+  DateTimePickerAndroid.open({
+    value,
+    mode: pickerMode,
+    display: pickerMode === 'date' ? 'calendar' : 'clock',
+    is24Hour: true,
+    onChange: (event, date) => {
+      if (event.type === 'dismissed' || !date) {
+        return;
+      }
+
+      if (mode === 'datetime' && pickerMode === 'date') {
+        onChange(mergeDatePart(value, date));
+        return;
+      }
+
+      if (mode === 'datetime' && pickerMode === 'time') {
+        onChange(mergeTimePart(value, date));
+        return;
+      }
+
+      onChange(date);
+    },
+  });
+}
+//date for tasks due date
+export function formatDueDate(value: string): string {
+  const [year, month, day] = value.split('-');
+
+  if (year && month && day) {
+    return `${day.padStart(2, '0')}.${month.padStart(2, '0')}`;
   }
 
   return value;
-}
-
-export function mapTaskFromDb(row: TaskDbRow): Task {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    title: row.title,
-    dueDate: row.due_date,
-    dueTime: row.due_time,
-    color: row.color ?? undefined,
-    notes: row.notes ?? undefined,
-    alertMinutes: row.alert_minutes ?? undefined,
-    isCompleted: row.is_completed,
-    fileUrls: row.file_urls ?? undefined,
-    createdAt: row.created_at,
-  };
 }

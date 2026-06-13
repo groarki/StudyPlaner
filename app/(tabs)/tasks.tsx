@@ -3,9 +3,9 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { CirclePlus } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
+import { mapTaskFromDb } from '../../lib/db-mappers';
 import { useTasksStore } from '../../store';
 import type { TaskDbRow } from '../../types';
-import { mapTaskFromDb } from '../../utils';
 import TaskCard from '../../components/ui/task-card';
 import ScreenWrapper from '../../components/screen-wrapper';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';

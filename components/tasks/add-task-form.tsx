@@ -16,6 +16,7 @@ import { ChevronDown, ChevronLeft } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { supabase } from '../../lib/supabase';
+import { mapTaskFromDb } from '../../lib/db-mappers';
 import { useTasksStore } from '../../store';
 import { Task, TaskDbRow } from '../../types';
 import { ALERT_OPTIONS } from '../../constants/options';
@@ -25,7 +26,7 @@ import BottomSheetModal from '../ui/bottom-sheet-modal';
 import AlertOptionsContent from '../ui/modal-contents/alert-options-content';
 import FilesPickerContent from '../ui/modal-contents/files-picker-content';
 import DateTimeConfirmContent from '../ui/modal-contents/date-time-confirm-content';
-import { formatDateForCalendar, formatTime, mapTaskFromDb } from '../../utils';
+import { formatDate, formatDateForCalendar, formatTime } from '../../utils';
 import { saveFileToAppStorage } from '../../utils/save-task-file';
 
 type ActiveModal = 'none' | 'dueTime' | 'alert' | 'files';
@@ -124,15 +125,7 @@ export default function AddTaskForm() {
     ? { screenTitle: 'Edit task', saveButtonTitle: 'Save changes' }
     : { screenTitle: 'Add task', saveButtonTitle: 'Add to calendar' };
 
-  const dueLabel = useMemo(
-    () =>
-      dueAt.toLocaleDateString('en-US', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'short',
-      }),
-    [dueAt],
-  );
+  const dueLabel = useMemo(() => formatDate(dueAt), [dueAt]);
 
   const closeModal = () => setActiveModal('none');
 

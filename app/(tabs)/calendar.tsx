@@ -12,13 +12,13 @@ import { router, useFocusEffect } from 'expo-router';
 import { Colors, FontSize, Spacing } from '../../constants/theme';
 import { useLecturesStore } from '../../store';
 import { supabase } from '../../lib/supabase';
+import { mapLectureFromDb } from '../../lib/db-mappers';
 import { Lecture, LectureDbRow } from '../../types';
 import WeekDayPicker from '../../components/calendar/weekday-picker';
 import LectureCard from '../../components/ui/lecture-card';
 import LectureActionsModal from '../../components/ui/lecture-actions-modal';
 import ConfirmDeleteModal from '../../components/ui/confirm-delete-modal';
 import ScreenWrapper from '../../components/screen-wrapper';
-import { mapLectureFromDb } from '../../utils';
 
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());

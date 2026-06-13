@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, ChevronDown } from 'lucide-react-native';
 import { supabase } from '../../lib/supabase';
+import { mapLectureFromDb } from '../../lib/db-mappers';
 import { Colors, FontSize, Spacing, BorderRadius, SCREEN_PADDING } from '../../constants/theme';
 import { DAYS, ALERT_OPTIONS } from '../../constants/options';
 import ColorPicker from '../ui/color-picker';
@@ -19,7 +20,7 @@ import BottomSheetModal from '../ui/bottom-sheet-modal';
 import DayPickerContent from '../ui/modal-contents/day-picker-content';
 import AlertOptionsContent from '../ui/modal-contents/alert-options-content';
 import DateTimeConfirmContent from '../ui/modal-contents/date-time-confirm-content';
-import { formatTime, mapLectureFromDb } from '../../utils';
+import { formatTime } from '../../utils';
 import { Lecture, LectureDbRow } from '../../types';
 import { useLecturesStore } from '../../store';
 
