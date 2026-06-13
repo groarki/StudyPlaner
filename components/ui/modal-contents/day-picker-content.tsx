@@ -20,7 +20,7 @@ export default function DayPickerContent({ options, selectedValue, onValueChange
       <View style={styles.dayPickerWrapper}>
         <Picker selectedValue={selectedValue} onValueChange={onValueChange} style={styles.picker}>
           {options.map((d) => (
-            <Picker.Item key={d.value} label={d.label} value={d.value} />
+            <Picker.Item key={d.value} label={d.label} value={d.value} color={Colors.text} />
           ))}
         </Picker>
       </View>
@@ -33,10 +33,6 @@ export default function DayPickerContent({ options, selectedValue, onValueChange
 
 const styles = StyleSheet.create({
   dayPickerWrapper: {
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.md,
-    marginBottom: Spacing.md,
     overflow: 'hidden',
   },
   picker: {
