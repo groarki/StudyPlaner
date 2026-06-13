@@ -35,7 +35,7 @@ export default function LectureCard({ lecture, onPress, onDetailsPress }: Props)
             onDetailsPress?.();
           }}
           disabled={!onDetailsPress}
-          hitSlop={40}
+          hitSlop={10}
         >
           <Text style={styles.notes}>
             Click for details
