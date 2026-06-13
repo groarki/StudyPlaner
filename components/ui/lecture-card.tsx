@@ -5,9 +5,12 @@ import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';
 interface Props {
   lecture: Lecture;
   onPress?: () => void;
+  onDetailsPress?: () => void;
 }
 
-export default function LectureCard({ lecture, onPress }: Props) {
+export default function LectureCard({ lecture, onPress, onDetailsPress }: Props) {
+  const details = lecture.notes?.trim();
+
   return (
     <TouchableOpacity
       style={[styles.card, { backgroundColor: lecture.color }]}
@@ -24,7 +27,21 @@ export default function LectureCard({ lecture, onPress }: Props) {
           </Text>
         </View>
       </View>
-      <Text style={styles.notes}>{ lecture.notes}</Text>
+      {details ? (
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={(event) => {
+            event.stopPropagation();
+            onDetailsPress?.();
+          }}
+          disabled={!onDetailsPress}
+          hitSlop={40}
+        >
+          <Text style={styles.notes}>
+            Click for details
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </TouchableOpacity>
   );
 }

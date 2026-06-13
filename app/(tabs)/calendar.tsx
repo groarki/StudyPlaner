@@ -18,11 +18,13 @@ import WeekDayPicker from '../../components/calendar/weekday-picker';
 import LectureCard from '../../components/ui/lecture-card';
 import LectureActionsModal from '../../components/ui/lecture-actions-modal';
 import ConfirmDeleteModal from '../../components/ui/confirm-delete-modal';
+import LectureDetailsModal from '../../components/ui/lecture-details-modal';
 import ScreenWrapper from '../../components/screen-wrapper';
 
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
+  const [detailsLecture, setDetailsLecture] = useState<Lecture | null>(null);
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -147,6 +149,7 @@ export default function CalendarScreen() {
                       setSelectedLecture(lecture);
                       setIsActionModalVisible(true);
                     }}
+                    onDetailsPress={() => setDetailsLecture(lecture)}
                   />
                 </View>
               </View>
@@ -171,6 +174,12 @@ export default function CalendarScreen() {
         isDeleting={isDeleting}
         onCancel={closeDeleteConfirmation}
         onConfirm={handleDeleteLecture}
+      />
+
+      <LectureDetailsModal
+        visible={Boolean(detailsLecture)}
+        lecture={detailsLecture}
+        onClose={() => setDetailsLecture(null)}
       />
     </ScreenWrapper>
   );
