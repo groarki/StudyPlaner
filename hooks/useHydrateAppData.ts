@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 import { supabase } from '../lib/supabase';
 import { mapLectureFromDb, mapTaskFromDb } from '../lib/db-mappers';
 import { useLecturesStore, useTasksStore } from '../store';
+import { loadCachedAppData, saveCachedAppData } from '../utils/app-data-cache';
 import type { LectureDbRow, TaskDbRow } from '../types';
 
 export function useHydrateAppData() {
@@ -24,9 +26,6 @@ export function useHydrateAppData() {
       setTasksLoading(true);
 
       try {
-        setLectures([]);
-        setTasks([]);
-
         const {
           data: { user },
           error: userError,
@@ -38,6 +37,28 @@ export function useHydrateAppData() {
           const message = userError?.message ?? 'User not found';
           setLecturesError(message);
           setTasksError(message);
+          return;
+        }
+
+        const cachedData = await loadCachedAppData(user.id);
+        if (!isMounted) return;
+
+        if (cachedData) {
+          setLectures(cachedData.lectures);
+          setTasks(cachedData.tasks);
+        }
+
+        const networkState = await NetInfo.fetch();
+        if (!isMounted) return;
+
+        const isOnline =
+          networkState.isConnected !== false && networkState.isInternetReachable !== false;
+
+        if (!isOnline) {
+          if (!cachedData) {
+            setLecturesError('No internet connection. Saved lectures are not available yet.');
+            setTasksError('No internet connection. Saved tasks are not available yet.');
+          }
           return;
         }
 
@@ -57,16 +78,30 @@ export function useHydrateAppData() {
 
         if (!isMounted) return;
 
+        const nextLectures = lecturesResponse.data
+          ? (lecturesResponse.data as LectureDbRow[]).map(mapLectureFromDb)
+          : cachedData?.lectures ?? [];
+        const nextTasks = tasksResponse.data
+          ? (tasksResponse.data as TaskDbRow[]).map(mapTaskFromDb)
+          : cachedData?.tasks ?? [];
+
         if (lecturesResponse.error) {
           setLecturesError(lecturesResponse.error.message);
-        } else if (lecturesResponse.data) {
-          setLectures((lecturesResponse.data as LectureDbRow[]).map(mapLectureFromDb));
+        } else {
+          setLectures(nextLectures);
         }
 
         if (tasksResponse.error) {
           setTasksError(tasksResponse.error.message);
-        } else if (tasksResponse.data) {
-          setTasks((tasksResponse.data as TaskDbRow[]).map(mapTaskFromDb));
+        } else {
+          setTasks(nextTasks);
+        }
+
+        if (!lecturesResponse.error && !tasksResponse.error) {
+          await saveCachedAppData(user.id, {
+            lectures: nextLectures,
+            tasks: nextTasks,
+          });
         }
       } finally {
         if (isMounted) {

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Lecture } from '../types';
 import { supabase } from '../lib/supabase';
+import { saveLecturesForCurrentUser } from '../utils/app-data-cache';
 
 interface LecturesState {
   lectures: Lecture[];
@@ -21,15 +22,26 @@ export const useLecturesStore = create<LecturesState>((set) => ({
   hasHydrated: false,
   error: null,
 
-  setLectures: (lectures) => set({ lectures, hasHydrated: true, error: null }),
+  setLectures: (lectures) => {
+    void saveLecturesForCurrentUser(lectures);
+    set({ lectures, hasHydrated: true, error: null });
+  },
 
   addLecture: (lecture) =>
-    set((state) => ({ lectures: [...state.lectures, lecture], hasHydrated: true })),
+    set((state) => {
+      const lectures = [...state.lectures, lecture];
+      void saveLecturesForCurrentUser(lectures);
+
+      return { lectures, hasHydrated: true };
+    }),
 
   updateLecture: (id, data) =>
-    set((state) => ({
-      lectures: state.lectures.map((l) => (l.id === id ? { ...l, ...data } : l)),
-    })),
+    set((state) => {
+      const lectures = state.lectures.map((l) => (l.id === id ? { ...l, ...data } : l));
+      void saveLecturesForCurrentUser(lectures);
+
+      return { lectures };
+    }),
 
   deleteLecture: async (id) => {
     try {
@@ -43,10 +55,12 @@ export const useLecturesStore = create<LecturesState>((set) => ({
         return false;
       }
 
-      set((state) => ({
-        error: null,
-        lectures: state.lectures.filter((l) => l.id !== id),
-      }));
+      set((state) => {
+        const lectures = state.lectures.filter((l) => l.id !== id);
+        void saveLecturesForCurrentUser(lectures);
+
+        return { error: null, lectures };
+      });
       return true;
     } catch {
       set({ error: 'Failed to delete lecture' });

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { Task } from '../types';
+import { saveTasksForCurrentUser } from '../utils/app-data-cache';
 
 interface TasksState {
   tasks: Task[];
@@ -21,27 +22,44 @@ export const useTasksStore = create<TasksState>((set) => ({
   hasHydrated: false,
   error: null,
 
-  setTasks: (tasks) => set({ tasks, hasHydrated: true, error: null }),
+  setTasks: (tasks) => {
+    void saveTasksForCurrentUser(tasks);
+    set({ tasks, hasHydrated: true, error: null });
+  },
 
   addTask: (task) =>
-    set((state) => ({ tasks: [...state.tasks, task], hasHydrated: true })),
+    set((state) => {
+      const tasks = [...state.tasks, task];
+      void saveTasksForCurrentUser(tasks);
+
+      return { tasks, hasHydrated: true };
+    }),
 
   updateTask: (id, data) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...data } : t)),
-    })),
+    set((state) => {
+      const tasks = state.tasks.map((t) => (t.id === id ? { ...t, ...data } : t));
+      void saveTasksForCurrentUser(tasks);
+
+      return { tasks };
+    }),
 
   deleteTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((t) => t.id !== id),
-    })),
+    set((state) => {
+      const tasks = state.tasks.filter((t) => t.id !== id);
+      void saveTasksForCurrentUser(tasks);
+
+      return { tasks };
+    }),
 
   toggleComplete: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((t) =>
+    set((state) => {
+      const tasks = state.tasks.map((t) =>
         t.id === id ? { ...t, isCompleted: !t.isCompleted } : t
-      ),
-    })),
+      );
+      void saveTasksForCurrentUser(tasks);
+
+      return { tasks };
+    }),
 
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error, hasHydrated: true }),
