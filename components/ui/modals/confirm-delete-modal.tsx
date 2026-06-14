@@ -1,5 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
+import { Colors, FontSize, Spacing } from '../../../constants/theme';
 
 type ConfirmDeleteModalProps = {
   visible: boolean;

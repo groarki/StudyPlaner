@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
  View,
  Text,
@@ -28,10 +28,7 @@ export default function CalendarScreen() {
  const [isDeleting, setIsDeleting] = useState(false);
  const { lectures, isLoading, deleteLecture } = useLecturesStore();
 
- const dayLectures = useMemo(
-  () => lectures.filter((lecture) => lecture.dayOfWeek === selectedDate.getDay()),
-  [lectures, selectedDate]
- );
+ const dayLectures = lectures.filter((lecture) => lecture.dayOfWeek === selectedDate.getDay());
 
  const openDeleteConfirmation = () => {
   if (!selectedLecture || isDeleting) return;

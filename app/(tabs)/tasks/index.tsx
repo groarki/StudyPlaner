@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import {
  ActivityIndicator,
  FlatList,
@@ -54,30 +54,27 @@ export default function TasksScreen() {
  const [activeView, setActiveView] = useState<ViewMode>('upcoming');
  const { tasks, updateTask, isLoading } = useTasksStore();
 
- const upcomingSections = useMemo(() => {
-  const upcoming = tasks.filter((task) => !task.isCompleted);
-  const grouped = new Map<string, typeof upcoming>();
+ const upcoming = tasks.filter((task) => !task.isCompleted);
+ const groupedTasks = new Map<string, Task[]>();
 
-  upcoming.forEach((task) => {
-   const key = task.dueDate || 'No date';
-   const current = grouped.get(key) ?? [];
-   current.push(task);
-   grouped.set(key, current);
-  });
+ upcoming.forEach((task) => {
+  const key = task.dueDate || 'No date';
+  const current = groupedTasks.get(key) ?? [];
+  current.push(task);
+  groupedTasks.set(key, current);
+ });
 
-  return Array.from(grouped.entries()).map(([date, items]) => ({ date, items }));
- }, [tasks]);
+ const upcomingSections = Array.from(groupedTasks.entries()).map(([date, items]) => ({
+  date,
+  items,
+ }));
 
- const completedTasks = useMemo(() => tasks.filter((task) => task.isCompleted), [tasks]);
+ const completedTasks = tasks.filter((task) => task.isCompleted);
 
- const upcomingListItems = useMemo<UpcomingListItem[]>(
-  () =>
-   upcomingSections.flatMap((section) => [
-    { type: 'header' as const, id: `header-${section.date}`, date: section.date },
-    ...section.items.map((task) => ({ type: 'task' as const, id: task.id, task })),
-   ]),
-  [upcomingSections]
- );
+ const upcomingListItems: UpcomingListItem[] = upcomingSections.flatMap((section) => [
+  { type: 'header' as const, id: `header-${section.date}`, date: section.date },
+  ...section.items.map((task) => ({ type: 'task' as const, id: task.id, task })),
+ ]);
 
  const openTask = (taskId: string) => {
   router.push({
@@ -95,103 +92,103 @@ export default function TasksScreen() {
   }
  };
 
- return (
-  <ScreenWrapper>
-   <View style={styles.header}>
-    <View style={styles.headerLeft}>
-     <Text style={styles.title}>Tasks</Text>
-     <TouchableOpacity style={styles.addButton} onPress={() => router.push('/add-task')}>
-      <CirclePlus size={28} />
-     </TouchableOpacity>
-    </View>
-   </View>
+    return (
+        <ScreenWrapper>
+            <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                    <Text style={styles.title}>Tasks</Text>
+                    <TouchableOpacity style={styles.addButton} onPress={() => router.push('/add-task')}>
+                        <CirclePlus size={28} />
+                    </TouchableOpacity>
+                </View>
+            </View>
 
-   <View style={styles.switchRow}>
-    <TouchableOpacity
-     style={[
-      styles.switchButton,
-      activeView === 'upcoming' ? styles.switchActive : styles.switchInactive,
-     ]}
-     onPress={() => setActiveView('upcoming')}
-     activeOpacity={0.9}
-    >
-     <Text
-      style={[
-       styles.switchText,
-       activeView === 'upcoming' ? styles.switchTextActive : styles.switchTextInactive,
-      ]}
-     >
-      Upcoming tasks
-     </Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-     style={[
-      styles.switchButton,
-      activeView === 'completed' ? styles.switchActive : styles.switchInactive,
-     ]}
-     onPress={() => setActiveView('completed')}
-     activeOpacity={0.9}
-    >
-     <Text
-      style={[
-       styles.switchText,
-       activeView === 'completed' ? styles.switchTextActive : styles.switchTextInactive,
-      ]}
-     >
-      Completed tasks
-     </Text>
-    </TouchableOpacity>
-   </View>
+            <View style={styles.switchRow}>
+                <TouchableOpacity
+                    style={[
+                        styles.switchButton,
+                        activeView === 'upcoming' ? styles.switchActive : styles.switchInactive,
+                    ]}
+                    onPress={() => setActiveView('upcoming')}
+                    activeOpacity={0.9}
+                >
+                    <Text
+                        style={[
+                            styles.switchText,
+                            activeView === 'upcoming' ? styles.switchTextActive : styles.switchTextInactive,
+                        ]}
+                    >
+                        Upcoming tasks
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={[
+                        styles.switchButton,
+                        activeView === 'completed' ? styles.switchActive : styles.switchInactive,
+                    ]}
+                    onPress={() => setActiveView('completed')}
+                    activeOpacity={0.9}
+                >
+                    <Text
+                        style={[
+                            styles.switchText,
+                            activeView === 'completed' ? styles.switchTextActive : styles.switchTextInactive,
+                        ]}
+                    >
+                        Completed tasks
+                    </Text>
+                </TouchableOpacity>
+            </View>
 
-   <View style={styles.content}>
-    {isLoading ? (
-     <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
-    ) : activeView === 'upcoming' ? (
-     <FlatList
-      data={upcomingListItems}
-      keyExtractor={(item) => item.id}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.contentInner}
-      ListEmptyComponent={<Text style={styles.emptyText}>No upcoming tasks</Text>}
-      renderItem={({ item }) => {
-       if (item.type === 'header') {
-        return (
-         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{formatHeadingDate(item.date)}</Text>
-          <View style={styles.sectionLine} />
-         </View>
-        );
-       }
+            <View style={styles.content}>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color={Colors.primary} style={styles.loader} />
+                ) : activeView === 'upcoming' ? (
+                    <FlatList
+                        data={upcomingListItems}
+                        keyExtractor={(item) => item.id}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.contentInner}
+                        ListEmptyComponent={<Text style={styles.emptyText}>No upcoming tasks</Text>}
+                        renderItem={({ item }) => {
+                            if (item.type === 'header') {
+                                return (
+                                    <View style={styles.sectionHeader}>
+                                        <Text style={styles.sectionTitle}>{formatHeadingDate(item.date)}</Text>
+                                        <View style={styles.sectionLine} />
+                                    </View>
+                                );
+                            }
 
-       return (
-        <View style={styles.taskListItem}>
-         <TaskCard
-          task={item.task}
-          swipeEnabled
-          onPress={() => openTask(item.task.id)}
-          onMarkComplete={markTaskCompleted}
-         />
-        </View>
-       );
-      }}
-     />
-    ) : (
-     <FlatList
-      data={completedTasks}
-      keyExtractor={(task) => task.id}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.contentInner}
-      ListEmptyComponent={<Text style={styles.emptyText}>No completed tasks</Text>}
-      renderItem={({ item }) => (
-       <View style={styles.taskListItem}>
-        <TaskCard task={item} onPress={() => openTask(item.id)} />
-       </View>
-      )}
-     />
-    )}
-   </View>
-  </ScreenWrapper>
- );
+                            return (
+                                <View style={styles.taskListItem}>
+                                    <TaskCard
+                                        task={item.task}
+                                        swipeEnabled
+                                        onPress={() => openTask(item.task.id)}
+                                        onMarkComplete={markTaskCompleted}
+                                    />
+                                </View>
+                            );
+                        }}
+                    />
+                ) : (
+                    <FlatList
+                        data={completedTasks}
+                        keyExtractor={(task) => task.id}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={styles.contentInner}
+                        ListEmptyComponent={<Text style={styles.emptyText}>No completed tasks</Text>}
+                        renderItem={({ item }) => (
+                            <View style={styles.taskListItem}>
+                                <TaskCard task={item} onPress={() => openTask(item.id)} />
+                            </View>
+                        )}
+                    />
+                )}
+            </View>
+        </ScreenWrapper>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -249,7 +246,6 @@ const styles = StyleSheet.create({
  },
  content: {
   flex: 1,
-  paddingTop: Spacing.md,
  },
  contentInner: {
   paddingBottom: Spacing.xl,

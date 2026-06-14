@@ -1,7 +1,6 @@
-import { useMemo } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { CalendarProvider, WeekCalendar, type DateData } from 'react-native-calendars';
-import { BorderRadius, Colors, FontSize, SCREEN_PADDING } from '../../constants/theme';
+import { Colors, FontSize, SCREEN_PADDING } from '../../constants/theme';
 import { formatDateForCalendar } from '../../utils';
 
 interface Props {
@@ -14,31 +13,25 @@ export default function WeekDayPicker({ selectedDate, onSelectDate }: Props) {
   const selectedDateString = formatDateForCalendar(selectedDate);
   const calendarWidth = Math.max(0, width - SCREEN_PADDING * 2);
 
-  const markedDates = useMemo(
-    () => ({
-      [selectedDateString]: {
-        selected: true,
-        selectedColor: Colors.primary,
-      },
-    }),
-    [selectedDateString],
-  );
+  const markedDates = {
+    [selectedDateString]: {
+      selected: true,
+      selectedColor: Colors.primary,
+    },
+  };
 
-  const calendarTheme = useMemo(
-    () => ({
-      backgroundColor: 'transparent',
-      calendarBackground: 'transparent',
-      textSectionTitleColor: Colors.textSecondary,
-      dayTextColor: Colors.text,
-      todayTextColor: Colors.primary,
-      selectedDayTextColor: Colors.background,
-      textDayFontSize: FontSize.lg,
-      textDayFontWeight: '600' as const,
-      textDayHeaderFontSize: FontSize.sm,
-      textDayHeaderFontWeight: '500' as const,
-    }),
-    [],
-  );
+  const calendarTheme = {
+    backgroundColor: 'transparent',
+    calendarBackground: 'transparent',
+    textSectionTitleColor: Colors.textSecondary,
+    dayTextColor: Colors.text,
+    todayTextColor: Colors.primary,
+    selectedDayTextColor: Colors.background,
+    textDayFontSize: FontSize.lg,
+    textDayFontWeight: '600' as const,
+    textDayHeaderFontSize: FontSize.sm,
+    textDayHeaderFontWeight: '500' as const,
+  };
 
   const handleDayPress = (day: DateData) => {
     if (day.dateString === selectedDateString) {

@@ -4,7 +4,6 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { Check } from 'lucide-react-native';
 import type { Task } from '../../types';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';
-import { formatDueDate } from '../../utils';
 
 interface Props {
   task: Task;

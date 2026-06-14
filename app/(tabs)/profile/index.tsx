@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -16,8 +15,6 @@ import { supabase } from '../../../lib/supabase';
 import { useAuthStore, useLecturesStore, useProfileStore, useTasksStore } from '../../../store';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
 import ScreenWrapper from '../../../components/screen-wrapper';
-
-const ALERT_OPTIONS = [5, 10, 15, 30, 60];
 
 export default function ProfileScreen() {
   const { logout } = useAuthStore();
@@ -33,7 +30,7 @@ export default function ProfileScreen() {
   } = useProfileStore();
 
   const [isNotificationSettingsVisible, setIsNotificationSettingsVisible] = useState(false);
-  const displayName = useMemo(() => name.trim() || 'Student', [name]);
+  const displayName = name.trim() || 'Student';
 
   useEffect(() => {
     let isMounted = true;

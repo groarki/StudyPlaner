@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -125,7 +125,7 @@ export default function AddTaskForm() {
     ? { screenTitle: 'Edit task', saveButtonTitle: 'Save changes' }
     : { screenTitle: 'Add task', saveButtonTitle: 'Add to calendar' };
 
-  const dueLabel = useMemo(() => formatDate(dueAt), [dueAt]);
+  const dueLabel = formatDate(dueAt);
 
   const closeModal = () => setActiveModal('none');
 
