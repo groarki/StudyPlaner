@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';
-import type { Lecture } from '../../types';
+import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
+import type { Lecture } from '../../../types';
 
 type LectureDetailsModalProps = {
   lecture: Lecture | null;

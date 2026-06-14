@@ -9,7 +9,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { Colors, BorderRadius, Spacing, FontSize } from '../../constants/theme';
+import { Colors, BorderRadius, Spacing, FontSize } from '../../../constants/theme';
 
 type BottomSheetModalProps = {
   visible: boolean;

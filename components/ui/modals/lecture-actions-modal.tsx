@@ -1,5 +1,5 @@
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Colors, FontSize, Spacing } from '../../constants/theme';
+import { Colors, FontSize, Spacing } from '../../../constants/theme';
 
 type LectureActionsModalProps = {
   visible: boolean;

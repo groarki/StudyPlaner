@@ -3,12 +3,12 @@ import { Check } from 'lucide-react-native';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';
 
 const PALETTE = [
-  '#F5F0C8', // жовтий
-  '#C8DCE8', // блакитний
-  '#E8C8C8', // рожевий
-  '#C8E8D4', // зелений
-  '#E8D4C8', // персиковий
-  '#D4C8E8', // лавандовий
+  '#F5F0C8', 
+  '#C8DCE8', 
+  '#E8C8C8', 
+  '#C8E8D4', 
+  '#E8D4C8', 
+  '#D4C8E8', 
 ];
 
 interface Props {

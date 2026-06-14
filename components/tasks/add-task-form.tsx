@@ -22,10 +22,10 @@ import { Task, TaskDbRow } from '../../types';
 import { ALERT_OPTIONS } from '../../constants/options';
 import { BorderRadius, Colors, FontSize, SCREEN_PADDING, Spacing } from '../../constants/theme';
 import ColorPicker from '../ui/color-picker';
-import BottomSheetModal from '../ui/bottom-sheet-modal';
-import AlertOptionsContent from '../ui/modal-contents/alert-options-content';
-import FilesPickerContent from '../ui/modal-contents/files-picker-content';
-import DateTimeConfirmContent from '../ui/modal-contents/date-time-confirm-content';
+import BottomSheetModal from '../ui/modals/bottom-sheet-modal';
+import AlertOptionsContent from '../ui/modals/alert-options-content';
+import FilesPickerContent from '../ui/modals/files-picker-content';
+import DateTimeConfirmContent from '../ui/modals/date-time-confirm-content';
 import { formatDate, formatDateForCalendar, formatTime } from '../../utils';
 import { saveFileToAppStorage } from '../../utils/save-task-file';
 

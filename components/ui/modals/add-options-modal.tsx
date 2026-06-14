@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { router, type Href } from 'expo-router';
 import { Animated, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BookMarked, CalendarPlus } from 'lucide-react-native';
-import { BorderRadius, Colors, FontSize, SCREEN_PADDING, Spacing } from '../../constants/theme';
+import { BorderRadius, Colors, FontSize, SCREEN_PADDING, Spacing } from '../../../constants/theme';
 
 type AddOptionsModalProps = {
   visible: boolean;
