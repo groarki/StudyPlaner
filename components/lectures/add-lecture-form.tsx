@@ -21,6 +21,7 @@ import DayPickerContent from '../ui/modals/day-picker-content';
 import AlertOptionsContent from '../ui/modals/alert-options-content';
 import DateTimeConfirmContent from '../ui/modals/date-time-confirm-content';
 import { formatTime } from '../../utils';
+import { offlineError } from '../../utils/network';
 import { Lecture, LectureDbRow } from '../../types';
 import { useLecturesStore } from '../../store';
 
@@ -108,6 +109,8 @@ export default function AddLectureForm() {
   const handleSave = async () => {
     if (!title.trim()) { setError('Please enter a title'); return; }
     if (!startTime || !endTime) { setError('Please select start and end time'); return; }
+
+    if (!(await offlineError(setError))) return;
 
     setIsLoading(true);
     setError(null);

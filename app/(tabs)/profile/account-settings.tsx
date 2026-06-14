@@ -26,6 +26,7 @@ import {
   isLocalFileUri,
   uploadAvatarToStorage,
 } from '../../../utils/upload-avatar';
+import { offlineAlert } from '../../../utils/network';
 
 export default function AccountSettingsScreen() {
   const { user, setUser } = useAuthStore();
@@ -111,6 +112,8 @@ export default function AccountSettingsScreen() {
       Alert.alert('Name required', 'Please enter your name.');
       return;
     }
+
+    if (!(await offlineAlert('Unable to save account'))) return;
 
     setIsSaving(true);
 

@@ -15,6 +15,8 @@ import type { Task } from '../../../types';
 import TaskCard from '../../../components/tasks/task-card';
 import ScreenWrapper from '../../../components/screen-wrapper';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
+import { hydrateAppData } from '../../../utils/hydrate-app-data';
+import { offlineAlert } from '../../../utils/network';
 
 type ViewMode = 'upcoming' | 'completed';
 type UpcomingListItem =
@@ -52,7 +54,7 @@ function formatHeadingDate(value: string): string {
 
 export default function TasksScreen() {
  const [activeView, setActiveView] = useState<ViewMode>('upcoming');
- const { tasks, updateTask, isLoading } = useTasksStore();
+ const { tasks, updateTask, isLoading, error } = useTasksStore();
 
  const upcoming = tasks.filter((task) => !task.isCompleted);
  const groupedTasks = new Map<string, Task[]>();
@@ -84,6 +86,8 @@ export default function TasksScreen() {
  };
 
  const markTaskCompleted = async (taskId: string) => {
+  if (!(await offlineAlert('Unable to update task'))) return;
+
   updateTask(taskId, { isCompleted: true });
   const { error } = await supabase.from('tasks').update({ is_completed: true }).eq('id', taskId);
 
@@ -149,7 +153,23 @@ export default function TasksScreen() {
                         keyExtractor={(item) => item.id}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.contentInner}
-                        ListEmptyComponent={<Text style={styles.emptyText}>No upcoming tasks</Text>}
+                        ListEmptyComponent={
+                          error && tasks.length === 0 ? (
+                            <View style={styles.errorState}>
+                              <Text style={styles.emptyText}>Unable to load tasks</Text>
+                              <Text style={styles.errorText}>{error}</Text>
+                              <TouchableOpacity
+                                style={styles.retryButton}
+                                activeOpacity={0.85}
+                                onPress={hydrateAppData}
+                              >
+                                <Text style={styles.retryButtonText}>Retry</Text>
+                              </TouchableOpacity>
+                            </View>
+                          ) : (
+                            <Text style={styles.emptyText}>No upcoming tasks</Text>
+                          )
+                        }
                         renderItem={({ item }) => {
                             if (item.type === 'header') {
                                 return (
@@ -178,7 +198,23 @@ export default function TasksScreen() {
                         keyExtractor={(task) => task.id}
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={styles.contentInner}
-                        ListEmptyComponent={<Text style={styles.emptyText}>No completed tasks</Text>}
+                        ListEmptyComponent={
+                          error && tasks.length === 0 ? (
+                            <View style={styles.errorState}>
+                              <Text style={styles.emptyText}>Unable to load tasks</Text>
+                              <Text style={styles.errorText}>{error}</Text>
+                              <TouchableOpacity
+                                style={styles.retryButton}
+                                activeOpacity={0.85}
+                                onPress={hydrateAppData}
+                              >
+                                <Text style={styles.retryButtonText}>Retry</Text>
+                              </TouchableOpacity>
+                            </View>
+                          ) : (
+                            <Text style={styles.emptyText}>No completed tasks</Text>
+                          )
+                        }
                         renderItem={({ item }) => (
                             <View style={styles.taskListItem}>
                                 <TaskCard task={item} onPress={() => openTask(item.id)} />
@@ -258,6 +294,27 @@ const styles = StyleSheet.create({
   color: Colors.textSecondary,
   fontSize: FontSize.lg,
   marginTop: 40,
+ },
+ errorState: {
+  alignItems: 'center',
+ },
+ errorText: {
+  color: Colors.textSecondary,
+  fontSize: FontSize.md,
+  textAlign: 'center',
+  marginTop: Spacing.xs,
+  marginBottom: Spacing.md,
+ },
+ retryButton: {
+  borderRadius: BorderRadius.xl,
+  paddingHorizontal: Spacing.lg,
+  paddingVertical: Spacing.sm,
+  backgroundColor: Colors.primary,
+ },
+ retryButtonText: {
+  color: Colors.background,
+  fontSize: FontSize.md,
+  fontWeight: '600',
  },
  sectionHeader: {
   flexDirection: 'row',

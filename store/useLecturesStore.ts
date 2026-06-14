@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Lecture } from '../types';
 import { supabase } from '../lib/supabase';
 import { saveLecturesForCurrentUser } from '../utils/app-data-cache';
+import { getOfflineMutationMessage } from '../utils/network';
 
 interface LecturesState {
   lectures: Lecture[];
@@ -45,6 +46,12 @@ export const useLecturesStore = create<LecturesState>((set) => ({
 
   deleteLecture: async (id) => {
     try {
+      const offlineMessage = await getOfflineMutationMessage();
+      if (offlineMessage) {
+        set({ error: offlineMessage });
+        return false;
+      }
+
       const { error } = await supabase
         .from('lectures')
         .delete()

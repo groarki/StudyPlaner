@@ -17,6 +17,7 @@ import ScreenWrapper from '../../../components/screen-wrapper';
 import ImagePreviewModal from '../../../components/ui/modals/image-preview-modal';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
 import { formatDueDate } from '../../../utils';
+import { offlineAlert } from '../../../utils/network';
 
 function normalizeParam(value: string | string[] | undefined): string {
  return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -42,7 +43,9 @@ export default function TaskDetailsScreen() {
  const task = storeTask;
 
  const toggleCompleted = async () => {
-  if (!task) return;
+ if (!task) return;
+
+  if (!(await offlineAlert('Unable to update task'))) return;
 
   const nextCompleted = !task.isCompleted;
   updateTask(task.id, { isCompleted: nextCompleted });

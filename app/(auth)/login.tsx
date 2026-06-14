@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase';
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants/theme';
 import { StatusBar } from 'expo-status-bar';
+import { offlineError } from '../../utils/network';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -39,9 +40,10 @@ export default function LoginScreen() {
       return;
     }
 
+    if (!(await offlineError(setError))) return;
+
     setIsLoading(true);
     setError(null);
-
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

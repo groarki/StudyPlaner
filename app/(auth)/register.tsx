@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../../lib/supabase';
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants/theme';
+import { offlineError } from '../../utils/network';
 
 type RegisterField = 'name' | 'email' | 'password';
 
@@ -53,9 +54,10 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (!(await offlineError(setError))) return;
+
     setIsLoading(true);
     setError(null);
-
     const { error } = await supabase.auth.signUp({
       email,
       password,

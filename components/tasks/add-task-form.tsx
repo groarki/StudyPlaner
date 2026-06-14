@@ -27,6 +27,7 @@ import AlertOptionsContent from '../ui/modals/alert-options-content';
 import FilesPickerContent from '../ui/modals/files-picker-content';
 import DateTimeConfirmContent from '../ui/modals/date-time-confirm-content';
 import { formatDate, formatDateForCalendar, formatTime } from '../../utils';
+import { offlineError } from '../../utils/network';
 import { saveFileToAppStorage } from '../../utils/save-task-file';
 
 type ActiveModal = 'none' | 'dueTime' | 'alert' | 'files';
@@ -225,9 +226,10 @@ export default function AddTaskForm() {
       return;
     }
 
+    if (!(await offlineError(setError))) return;
+
     setIsLoading(true);
     setError(null);
-
     try {
       const {
         data: { user },
