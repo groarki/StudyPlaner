@@ -95,3 +95,40 @@ export function getGreeting(): string {
   if (hour < 18) return 'Good afternoon!';
   return 'Good evening!';
 }
+
+export function getInitials(name: string): string {
+  const trimmedName = name.trim();
+  if (!trimmedName) return 'S';
+
+  return trimmedName
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
+}
+
+function normalizeUrl(value: string): string {
+  const trimmed = value.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+export function getValidUrl(value: string): string | null {
+  const normalizedUrl = normalizeUrl(value);
+
+  if (/\s/.test(normalizedUrl)) return null;
+
+  try {
+    const parsedUrl = new URL(normalizedUrl);
+    const isWebProtocol = parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+    const hasValidHost = parsedUrl.hostname.includes('.') && !parsedUrl.hostname.includes('..');
+
+    if (!isWebProtocol || !hasValidHost) {
+      return null;
+    }
+
+    return parsedUrl.toString();
+  } catch {
+    return null;
+  }
+}

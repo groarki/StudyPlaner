@@ -65,3 +65,9 @@ export interface HelpfulLink {
   title: string;
   url: string;
 }
+
+export interface NotificationSettings {
+  remindersEnabled: boolean;
+  lectureRemindersEnabled: boolean;
+  taskRemindersEnabled: boolean;
+}
