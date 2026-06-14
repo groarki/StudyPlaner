@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { CirclePlus } from 'lucide-react-native';
@@ -20,23 +20,15 @@ export default function HomeTab() {
   const todayKey = formatDateForCalendar(today);
   const todayDayOfWeek = today.getDay();
 
-  const todayLectures = useMemo(
-    () =>
-      lectures
-        .filter((lecture) => lecture.dayOfWeek === todayDayOfWeek)
-        .sort((a, b) => a.startTime.localeCompare(b.startTime))
-        .slice(0, 3),
-    [lectures, todayDayOfWeek],
-  );
+  const todayLectures = lectures
+    .filter((lecture) => lecture.dayOfWeek === todayDayOfWeek)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime))
+    .slice(0, 3);
 
-  const todayTasks = useMemo(
-    () =>
-      tasks
-        .filter((task) => !task.isCompleted && task.dueDate === todayKey)
-        .sort((a, b) => a.dueTime.localeCompare(b.dueTime))
-        .slice(0, 2),
-    [tasks, todayKey],
-  );
+  const todayTasks = tasks
+    .filter((task) => !task.isCompleted && task.dueDate === todayKey)
+    .sort((a, b) => a.dueTime.localeCompare(b.dueTime))
+    .slice(0, 2);
 
   const isLoading = lecturesLoading || tasksLoading;
 
@@ -144,10 +136,11 @@ const styles = StyleSheet.create({
     marginTop: 80,
   },
   lecturesSection: {
-    minHeight: 320,
+    minHeight: 380,
     paddingTop: Spacing.sm,
   },
   lecturesList: {
+    flex: 1,
     position: 'relative',
     gap: Spacing.xs,
   },
@@ -179,6 +172,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E4E4E4',
     paddingTop: Spacing.lg,
+    minHeight: 250,
     marginTop: 'auto',
   },
   sectionTitle: {

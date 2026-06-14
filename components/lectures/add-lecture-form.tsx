@@ -37,7 +37,7 @@ export default function AddLectureForm() {
   const params = useLocalSearchParams<{ lectureId?: string | string[] }>();
   const lectureId = Array.isArray(params.lectureId) ? params.lectureId[0] : params.lectureId;
   const isEditMode = !!lectureId;
-  const { lectures, updateLecture } = useLecturesStore();
+  const { lectures, addLecture, updateLecture } = useLecturesStore();
 
   const [title, setTitle] = useState('');
   const [dayOfWeek, setDayOfWeek] = useState<number>(1);
@@ -151,15 +151,21 @@ export default function AddLectureForm() {
           alertMinutes: payload.alert_minutes ?? undefined,
         });
       } else {
-        const { error: insertError } = await supabase.from('lectures').insert({
-          user_id: user.id,
-          ...payload,
-        });
+        const { data, error: insertError } = await supabase
+          .from('lectures')
+          .insert({
+            user_id: user.id,
+            ...payload,
+          })
+          .select('*')
+          .single();
 
         if (insertError) {
           setError(insertError.message);
           return;
         }
+
+        addLecture(mapLectureFromDb(data as LectureDbRow));
       }
 
       router.back();

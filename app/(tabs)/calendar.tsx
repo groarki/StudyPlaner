@@ -84,38 +84,41 @@ export default function CalendarScreen() {
 
    <WeekDayPicker selectedDate={selectedDate} onSelectDate={setSelectedDate} />
 
-   <FlatList
-    data={isLoading ? [] : dayLectures}
-    keyExtractor={(lecture) => lecture.id}
-    style={styles.timeline}
-    showsVerticalScrollIndicator={false}
-    contentContainerStyle={styles.timelineContent}
-    ListEmptyComponent={
-      isLoading ? (
-        <ActivityIndicator size="large" color={Colors.primary} style={styles.loadingIndicator} />
-      ) : (
-        <View style={styles.emptyContainer}>
-       <Text style={styles.emptyText}>No lectures today</Text>
-       <Text style={styles.emptySubtext}>Tap + to add a lecture</Text>
+   <View style={styles.timelineContainer}>
+    {!isLoading && dayLectures.length > 0 ? <View style={styles.timelineRail} /> : null}
+    <FlatList
+     data={isLoading ? [] : dayLectures}
+     keyExtractor={(lecture) => lecture.id}
+     style={styles.timeline}
+     showsVerticalScrollIndicator={false}
+     contentContainerStyle={styles.timelineContent}
+     ListEmptyComponent={
+       isLoading ? (
+         <ActivityIndicator size="large" color={Colors.primary} style={styles.loadingIndicator} />
+       ) : (
+         <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No lectures today</Text>
+        <Text style={styles.emptySubtext}>Tap + to add a lecture</Text>
+       </View>
+      )
+     }
+        renderItem={({ item: lecture }) => (
+         <View style={styles.lectureRow}>
+       <View style={styles.timelineDot} />
+       <View style={styles.lectureCardWrapper}>
+        <LectureCard
+         lecture={lecture}
+         onPress={() => {
+           setSelectedLecture(lecture);
+           setIsActionModalVisible(true);
+         }}
+         onDetailsPress={() => setDetailsLecture(lecture)}
+        />
+       </View>
       </View>
-     )
-    }
-       renderItem={({ item: lecture }) => (
-        <View style={styles.lectureRow}>
-      <View style={styles.timelineDot} />
-      <View style={styles.lectureCardWrapper}>
-       <LectureCard
-        lecture={lecture}
-        onPress={() => {
-          setSelectedLecture(lecture);
-          setIsActionModalVisible(true);
-        }}
-        onDetailsPress={() => setDetailsLecture(lecture)}
-       />
-      </View>
-     </View>
-    )}
-   />
+     )}
+    />
+   </View>
 
    <LectureActionsModal
     visible={isActionModalVisible}
@@ -175,6 +178,10 @@ const styles = StyleSheet.create({
   fontSize: FontSize.xl,
   fontWeight: '600',
  },
+ timelineContainer: {
+  flex: 1,
+  position: 'relative',
+ },
  timeline: {
   flex: 1,
   marginHorizontal: -16,
@@ -192,19 +199,15 @@ const styles = StyleSheet.create({
   alignItems: 'flex-start',
   gap: Spacing.sm,
   marginBottom: Spacing.md,
-  },
-   lecturesList: {
-    position: 'relative',
-    gap: Spacing.md,
-  },
-  timelineRail: {
-    position: 'absolute',
-    left: 3,
-    top: 0,
-    bottom: 0,
-    width: 1,
-    backgroundColor: '#8E9595',
-  },
+ },
+ timelineRail: {
+  position: 'absolute',
+  left: 3,
+  top: Spacing.md,
+  bottom: Spacing.xl,
+  width: 1,
+  backgroundColor: '#8E9595',
+ },
  timelineDot: {
   width: 7,
   height: 7,
