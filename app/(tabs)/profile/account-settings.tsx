@@ -20,6 +20,12 @@ import { useAuthStore, useProfileStore } from '../../../store';
 import ScreenWrapper from '../../../components/screen-wrapper';
 import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
 import { getInitials } from '../../../utils';
+import {
+  deleteAvatarFromStorageUrl,
+  getAvatarUploadErrorMessage,
+  isLocalFileUri,
+  uploadAvatarToStorage,
+} from '../../../utils/upload-avatar';
 
 export default function AccountSettingsScreen() {
   const { user, setUser } = useAuthStore();
@@ -87,7 +93,7 @@ export default function AccountSettingsScreen() {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.8,
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
     });
 
     if (result.canceled) return;
@@ -108,29 +114,56 @@ export default function AccountSettingsScreen() {
 
     setIsSaving(true);
 
-    const { data, error } = await supabase.auth.updateUser({
-      data: {
+    try {
+      const {
+        data: { user: authUser },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !authUser) {
+        Alert.alert('Unable to save account', userError?.message ?? 'User not found.');
+        return;
+      }
+
+      const nextAvatarUrl = isLocalFileUri(draftAvatarUrl)
+        ? await uploadAvatarToStorage(authUser.id, draftAvatarUrl)
+        : draftAvatarUrl;
+
+      const { data, error } = await supabase.auth.updateUser({
+        data: {
+          name: nextName,
+          avatarUrl: nextAvatarUrl,
+        },
+      });
+
+      if (error) {
+        Alert.alert('Unable to save account', error.message);
+        return;
+      }
+
+      setName(nextName);
+      setAvatarUrl(nextAvatarUrl);
+      setDraftAvatarUrl(nextAvatarUrl);
+      setUser({
+        id: data.user.id,
+        email: data.user.email ?? email,
         name: nextName,
-        avatarUrl: draftAvatarUrl,
-      },
-    });
+        avatarUrl: nextAvatarUrl ?? undefined,
+      });
 
-    setIsSaving(false);
+      if (avatarUrl && avatarUrl !== nextAvatarUrl && !isLocalFileUri(avatarUrl)) {
+        await deleteAvatarFromStorageUrl(avatarUrl);
+      }
 
-    if (error) {
-      Alert.alert('Unable to save account', error.message);
-      return;
+      router.back();
+    } catch (saveError) {
+      Alert.alert(
+        'Unable to save account',
+        getAvatarUploadErrorMessage(saveError)
+      );
+    } finally {
+      setIsSaving(false);
     }
-
-    setName(nextName);
-    setAvatarUrl(draftAvatarUrl);
-    setUser({
-      id: data.user.id,
-      email: data.user.email ?? email,
-      name: nextName,
-      avatarUrl: draftAvatarUrl ?? undefined,
-    });
-    router.back();
   };
 
   return (
