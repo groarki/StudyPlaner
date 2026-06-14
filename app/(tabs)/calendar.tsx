@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,17 +8,15 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { CirclePlus } from 'lucide-react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { Colors, FontSize, Spacing } from '../../constants/theme';
 import { useLecturesStore } from '../../store';
-import { supabase } from '../../lib/supabase';
-import { mapLectureFromDb } from '../../lib/db-mappers';
-import { Lecture, LectureDbRow } from '../../types';
+import { Lecture } from '../../types';
 import WeekDayPicker from '../../components/calendar/weekday-picker';
-import LectureCard from '../../components/ui/lecture-card';
-import LectureActionsModal from '../../components/ui/lecture-actions-modal';
-import ConfirmDeleteModal from '../../components/ui/confirm-delete-modal';
-import LectureDetailsModal from '../../components/ui/lecture-details-modal';
+import LectureCard from '../../components/lectures/lecture-card';
+import LectureActionsModal from '../../components/ui/modals/lecture-actions-modal';
+import ConfirmDeleteModal from '../../components/ui/modals/confirm-delete-modal';
+import LectureDetailsModal from '../../components/ui/modals/lecture-details-modal';
 import ScreenWrapper from '../../components/screen-wrapper';
 
 export default function CalendarScreen() {
@@ -28,35 +26,7 @@ export default function CalendarScreen() {
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { lectures, setLectures, isLoading, setLoading, deleteLecture } = useLecturesStore();
-
-  const fetchLectures = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('lectures')
-        .select('*')
-        .order('start_time', { ascending: true });
-
-      if (error || !data) {
-        return;
-      }
-
-      setLectures((data as LectureDbRow[]).map(mapLectureFromDb));
-    } finally {
-      setLoading(false);
-    }
-  }, [setLectures, setLoading]);
-
-  useEffect(() => {
-    fetchLectures();
-  }, [fetchLectures]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchLectures();
-    }, [fetchLectures]),
-  );
+  const { lectures, isLoading, deleteLecture } = useLecturesStore();
 
   const dayLectures = useMemo(
     () => lectures.filter((lecture) => lecture.dayOfWeek === selectedDate.getDay()),

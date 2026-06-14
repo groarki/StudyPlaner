@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { CirclePlus } from 'lucide-react-native';
-import { supabase } from '../../lib/supabase';
-import { mapTaskFromDb } from '../../lib/db-mappers';
-import { useTasksStore } from '../../store';
-import type { TaskDbRow } from '../../types';
-import TaskCard from '../../components/ui/task-card';
-import ScreenWrapper from '../../components/screen-wrapper';
-import { BorderRadius, Colors, FontSize, Spacing } from '../../constants/theme';
+import { supabase } from '../../../lib/supabase';
+import { useTasksStore } from '../../../store';
+import TaskCard from '../../../components/tasks/task-card';
+import ScreenWrapper from '../../../components/screen-wrapper';
+import { BorderRadius, Colors, FontSize, Spacing } from '../../../constants/theme';
 
 type ViewMode = 'upcoming' | 'completed';
 
@@ -23,7 +21,7 @@ function parseTaskDate(value: string): Date | null {
   if (parts.length === 3 && parts.every((part) => !Number.isNaN(part))) {
     const [a, b, c] = parts;
     const year = String(a).length === 4 ? a : c;
-    const month = String(a).length === 4 ? b : b;
+    const month = b;
     const day = String(a).length === 4 ? c : a;
     const date = new Date(year, month - 1, day);
     return Number.isNaN(date.getTime()) ? null : date;
@@ -41,31 +39,9 @@ function formatHeadingDate(value: string): string {
   return `${weekday}, ${day}.${month}`;
 }
 
-export default function TasksTab() {
-  const params = useLocalSearchParams<{ view?: string }>();
-  const activeView: ViewMode = params.view === 'completed' ? 'completed' : 'upcoming';
-  const { tasks, setTasks, updateTask, isLoading, setLoading } = useTasksStore();
-
-  const fetchTasks = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.from('tasks').select('*').order('due_date', { ascending: true });
-      if (error || !data) return;
-      setTasks((data as TaskDbRow[]).map(mapTaskFromDb));
-    } finally {
-      setLoading(false);
-    }
-  }, [setLoading, setTasks]);
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchTasks();
-    }, [fetchTasks]),
-  );
+export default function TasksScreen() {
+  const [activeView, setActiveView] = useState<ViewMode>('upcoming');
+  const { tasks, updateTask, isLoading } = useTasksStore();
 
   const upcomingSections = useMemo(() => {
     const upcoming = tasks.filter((task) => !task.isCompleted);
@@ -83,10 +59,10 @@ export default function TasksTab() {
 
   const completedTasks = useMemo(() => tasks.filter((task) => task.isCompleted), [tasks]);
 
-  const switchView = (nextView: ViewMode) => {
-    router.replace({
-      pathname: '/(tabs)/tasks',
-      params: { view: nextView },
+  const openTask = (taskId: string) => {
+    router.push({
+      pathname: '/(tabs)/tasks/[id]',
+      params: { id: taskId },
     });
   };
 
@@ -116,7 +92,7 @@ export default function TasksTab() {
       <View style={styles.switchRow}>
         <TouchableOpacity
           style={[styles.switchButton, activeView === 'upcoming' ? styles.switchActive : styles.switchInactive]}
-          onPress={() => switchView('upcoming')}
+          onPress={() => setActiveView('upcoming')}
           activeOpacity={0.9}
         >
           <Text style={[styles.switchText, activeView === 'upcoming' ? styles.switchTextActive : styles.switchTextInactive]}>
@@ -125,7 +101,7 @@ export default function TasksTab() {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.switchButton, activeView === 'completed' ? styles.switchActive : styles.switchInactive]}
-          onPress={() => switchView('completed')}
+          onPress={() => setActiveView('completed')}
           activeOpacity={0.9}
         >
           <Text style={[styles.switchText, activeView === 'completed' ? styles.switchTextActive : styles.switchTextInactive]}>
@@ -151,7 +127,13 @@ export default function TasksTab() {
 
                   <View style={styles.cards}>
                     {section.items.map((task) => (
-                      <TaskCard key={task.id} task={task} swipeEnabled onMarkComplete={markTaskCompleted} />
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        swipeEnabled
+                        onPress={() => openTask(task.id)}
+                        onMarkComplete={markTaskCompleted}
+                      />
                     ))}
                   </View>
                 </View>
@@ -165,7 +147,7 @@ export default function TasksTab() {
             ) : (
               <View style={styles.cards}>
                 {completedTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
+                  <TaskCard key={task.id} task={task} onPress={() => openTask(task.id)} />
                 ))}
               </View>
             )}

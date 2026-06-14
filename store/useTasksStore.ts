@@ -4,6 +4,7 @@ import type { Task } from '../types';
 interface TasksState {
   tasks: Task[];
   isLoading: boolean;
+  hasHydrated: boolean;
   error: string | null;
   setTasks: (tasks: Task[]) => void;
   addTask: (task: Task) => void;
@@ -17,12 +18,13 @@ interface TasksState {
 export const useTasksStore = create<TasksState>((set) => ({
   tasks: [],
   isLoading: false,
+  hasHydrated: false,
   error: null,
 
-  setTasks: (tasks) => set({ tasks }),
+  setTasks: (tasks) => set({ tasks, hasHydrated: true, error: null }),
 
   addTask: (task) =>
-    set((state) => ({ tasks: [...state.tasks, task] })),
+    set((state) => ({ tasks: [...state.tasks, task], hasHydrated: true })),
 
   updateTask: (id, data) =>
     set((state) => ({
@@ -42,5 +44,5 @@ export const useTasksStore = create<TasksState>((set) => ({
     })),
 
   setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
+  setError: (error) => set({ error, hasHydrated: true }),
 }));

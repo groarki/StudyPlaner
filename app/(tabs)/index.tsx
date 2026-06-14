@@ -1,59 +1,24 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
-import { ArrowDown, CirclePlus } from 'lucide-react-native';
-import { supabase } from '../../lib/supabase';
-import { mapLectureFromDb, mapTaskFromDb } from '../../lib/db-mappers';
+import { router } from 'expo-router';
+import { CirclePlus } from 'lucide-react-native';
 import { useLecturesStore, useTasksStore } from '../../store';
-import type { Lecture, LectureDbRow, TaskDbRow } from '../../types';
+import type { Lecture } from '../../types';
 import ScreenWrapper from '../../components/screen-wrapper';
-import LectureCard from '../../components/ui/lecture-card';
-import LectureDetailsModal from '../../components/ui/lecture-details-modal';
-import TaskCard from '../../components/ui/task-card';
+import LectureCard from '../../components/lectures/lecture-card';
+import LectureDetailsModal from '../../components/ui/modals/lecture-details-modal';
+import TaskCard from '../../components/tasks/task-card';
 import { Colors, FontSize, Spacing } from '../../constants/theme';
 import { formatDateForCalendar, getGreeting } from '../../utils';
 
 export default function HomeTab() {
   const [detailsLecture, setDetailsLecture] = useState<Lecture | null>(null);
-  const { lectures, setLectures, isLoading: lecturesLoading, setLoading: setLecturesLoading } = useLecturesStore();
-  const { tasks, setTasks, isLoading: tasksLoading, setLoading: setTasksLoading } = useTasksStore();
+  const { lectures, isLoading: lecturesLoading } = useLecturesStore();
+  const { tasks, isLoading: tasksLoading } = useTasksStore();
 
   const today = new Date();
   const todayKey = formatDateForCalendar(today);
   const todayDayOfWeek = today.getDay();
-
-  const fetchDashboardData = useCallback(async () => {
-    setLecturesLoading(true);
-    setTasksLoading(true);
-
-    try {
-      const [lecturesResponse, tasksResponse] = await Promise.all([
-        supabase.from('lectures').select('*').order('start_time', { ascending: true }),
-        supabase.from('tasks').select('*').order('due_time', { ascending: true }),
-      ]);
-
-      if (!lecturesResponse.error && lecturesResponse.data) {
-        setLectures((lecturesResponse.data as LectureDbRow[]).map(mapLectureFromDb));
-      }
-
-      if (!tasksResponse.error && tasksResponse.data) {
-        setTasks((tasksResponse.data as TaskDbRow[]).map(mapTaskFromDb));
-      }
-    } finally {
-      setLecturesLoading(false);
-      setTasksLoading(false);
-    }
-  }, [setLectures, setLecturesLoading, setTasks, setTasksLoading]);
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchDashboardData();
-    }, [fetchDashboardData]),
-  );
 
   const todayLectures = useMemo(
     () =>

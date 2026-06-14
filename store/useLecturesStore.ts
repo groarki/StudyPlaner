@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 interface LecturesState {
   lectures: Lecture[];
   isLoading: boolean;
+  hasHydrated: boolean;
   error: string | null;
   setLectures: (lectures: Lecture[]) => void;
   addLecture: (lecture: Lecture) => void;
@@ -17,12 +18,13 @@ interface LecturesState {
 export const useLecturesStore = create<LecturesState>((set) => ({
   lectures: [],
   isLoading: false,
+  hasHydrated: false,
   error: null,
 
-  setLectures: (lectures) => set({ lectures }),
+  setLectures: (lectures) => set({ lectures, hasHydrated: true, error: null }),
 
   addLecture: (lecture) =>
-    set((state) => ({ lectures: [...state.lectures, lecture] })),
+    set((state) => ({ lectures: [...state.lectures, lecture], hasHydrated: true })),
 
   updateLecture: (id, data) =>
     set((state) => ({
@@ -53,5 +55,5 @@ export const useLecturesStore = create<LecturesState>((set) => ({
   },
 
   setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
+  setError: (error) => set({ error, hasHydrated: true }),
 }));

@@ -9,13 +9,14 @@ import {
 } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HapticTab } from '../../components/ui/haptic-tab';
-import AddOptionsModal from '../../components/ui/add-options-modal';
+import AddOptionsModal from '../../components/ui/modals/add-options-modal';
 import { Colors } from '../../constants/theme';
-
+import { useHydrateAppData } from '../../hooks/useHydrateAppData';
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  useHydrateAppData();
 
   return (
     <>
