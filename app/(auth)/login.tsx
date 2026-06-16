@@ -16,12 +16,15 @@ import { supabase } from '../../lib/supabase';
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants/theme';
 import { StatusBar } from 'expo-status-bar';
 import { offlineError } from '../../utils/network';
+import { useAuthStore, useProfileStore } from '../../store';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setUser } = useAuthStore();
+  const { setName, setAvatarUrl } = useProfileStore();
   const formScrollRef = useRef<ScrollView>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const fieldOffsetsRef = useRef({ email: 0, password: 0 });
@@ -44,7 +47,7 @@ export default function LoginScreen() {
 
     setIsLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -54,6 +57,22 @@ export default function LoginScreen() {
     if (error) {
       setError(error.message);
     } else {
+      const userName = data.user?.user_metadata?.name;
+      const userAvatarUrl = data.user?.user_metadata?.avatarUrl;
+      const nextName = typeof userName === 'string' ? userName.trim() : '';
+      const nextAvatarUrl =
+        typeof userAvatarUrl === 'string' && userAvatarUrl.trim() ? userAvatarUrl.trim() : null;
+
+      setName(nextName);
+      setAvatarUrl(nextAvatarUrl);
+      if (data.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email ?? email,
+          name: nextName,
+          avatarUrl: nextAvatarUrl ?? undefined,
+        });
+      }
       router.replace('/(tabs)');
     }
   };

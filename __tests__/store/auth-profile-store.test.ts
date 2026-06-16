@@ -63,4 +63,30 @@ describe('profile store', () => {
       taskRemindersEnabled: false,
     });
   });
+
+  it('resets user-specific profile data on logout', () => {
+    useProfileStore.setState({
+      name: 'First User',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      helpfulLinks: [{ id: 'link-1', title: 'Docs', url: 'https://docs.example' }],
+      notificationSettings: {
+        remindersEnabled: false,
+        lectureRemindersEnabled: false,
+        taskRemindersEnabled: false,
+      },
+    });
+
+    useProfileStore.getState().resetProfile();
+
+    expect(useProfileStore.getState()).toMatchObject({
+      name: '',
+      avatarUrl: null,
+      helpfulLinks: [],
+      notificationSettings: {
+        remindersEnabled: true,
+        lectureRemindersEnabled: true,
+        taskRemindersEnabled: true,
+      },
+    });
+  });
 });

@@ -3,6 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { HelpfulLink, NotificationSettings } from '../types';
 
+const defaultNotificationSettings: NotificationSettings = {
+  remindersEnabled: true,
+  lectureRemindersEnabled: true,
+  taskRemindersEnabled: true,
+};
+
 interface ProfileState {
   name: string;
   avatarUrl: string | null;
@@ -14,6 +20,7 @@ interface ProfileState {
   addHelpfulLink: (link: HelpfulLink) => void;
   removeHelpfulLink: (id: string) => void;
   updateNotificationSettings: (settings: Partial<NotificationSettings>) => void;
+  resetProfile: () => void;
 }
 
 export const useProfileStore = create<ProfileState>()(
@@ -21,11 +28,7 @@ export const useProfileStore = create<ProfileState>()(
     name: '',
     avatarUrl: null,
     helpfulLinks: [],
-    notificationSettings: {
-      remindersEnabled: true,
-      lectureRemindersEnabled: true,
-      taskRemindersEnabled: true,
-    },
+    notificationSettings: defaultNotificationSettings,
 
     setName: (name) => set({ name }),
     setAvatarUrl: (avatarUrl) => set({ avatarUrl }),
@@ -43,6 +46,13 @@ export const useProfileStore = create<ProfileState>()(
       set((state) => ({
         notificationSettings: { ...state.notificationSettings, ...settings },
       })),
+    resetProfile: () =>
+      set({
+        name: '',
+        avatarUrl: null,
+        helpfulLinks: [],
+        notificationSettings: defaultNotificationSettings,
+      }),
   }), {
     name: 'studyplanner-profile',
     storage: createJSONStorage(() => AsyncStorage),

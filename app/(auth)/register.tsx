@@ -16,6 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import { supabase } from '../../lib/supabase';
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants/theme';
 import { offlineError } from '../../utils/network';
+import { useAuthStore, useProfileStore } from '../../store';
 
 type RegisterField = 'name' | 'email' | 'password';
 
@@ -25,6 +26,8 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { setUser } = useAuthStore();
+  const { setName: setProfileName, setAvatarUrl } = useProfileStore();
 
   const formScrollRef = useRef<ScrollView>(null);
   const emailInputRef = useRef<TextInput>(null);
@@ -58,11 +61,12 @@ export default function RegisterScreen() {
 
     setIsLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({
+    const trimmedName = name.trim();
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { name },
+        data: { name: trimmedName },
       },
     });
 
@@ -71,6 +75,16 @@ export default function RegisterScreen() {
     if (error) {
       setError(error.message);
       return;
+    }
+
+    setProfileName(trimmedName);
+    setAvatarUrl(null);
+    if (data.user) {
+      setUser({
+        id: data.user.id,
+        email: data.user.email ?? email,
+        name: trimmedName,
+      });
     }
 
     router.replace('/(tabs)');

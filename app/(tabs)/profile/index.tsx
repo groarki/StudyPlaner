@@ -27,6 +27,7 @@ export default function ProfileScreen() {
     setName,
     setAvatarUrl,
     updateNotificationSettings,
+    resetProfile,
   } = useProfileStore();
 
   const [isNotificationSettingsVisible, setIsNotificationSettingsVisible] = useState(false);
@@ -42,13 +43,12 @@ export default function ProfileScreen() {
 
       if (!isMounted) return;
 
-      if (typeof userName === 'string' && userName.trim()) {
-        setName(userName.trim());
-      }
-
-      if (typeof userAvatarUrl === 'string' && userAvatarUrl.trim()) {
-        setAvatarUrl(userAvatarUrl.trim());
-      }
+      setName(typeof userName === 'string' ? userName.trim() : '');
+      setAvatarUrl(
+        typeof userAvatarUrl === 'string' && userAvatarUrl.trim()
+          ? userAvatarUrl.trim()
+          : null
+      );
     };
 
     hydrateProfile();
@@ -62,6 +62,7 @@ export default function ProfileScreen() {
     await supabase.auth.signOut();
     setTasks([]);
     setLectures([]);
+    resetProfile();
     logout();
     router.replace('/(auth)/login');
   };
