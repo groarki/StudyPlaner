@@ -30,7 +30,9 @@ export default function CalendarScreen() {
  const [isDeleting, setIsDeleting] = useState(false);
  const { lectures, isLoading, error, deleteLecture } = useLecturesStore();
 
- const dayLectures = lectures.filter((lecture) => lecture.dayOfWeek === selectedDate.getDay());
+ const dayLectures = lectures
+  .filter((lecture) => lecture.dayOfWeek === selectedDate.getDay())
+  .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
  const openDeleteConfirmation = () => {
   if (!selectedLecture || isDeleting) return;
