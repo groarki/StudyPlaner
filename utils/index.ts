@@ -114,6 +114,10 @@ function normalizeUrl(value: string): string {
 }
 
 export function getValidUrl(value: string): string | null {
+  if (/^[a-z][a-z\d+.-]*:/i.test(value.trim()) && !/^https?:\/\//i.test(value.trim())) {
+    return null;
+  }
+
   const normalizedUrl = normalizeUrl(value);
 
   if (/\s/.test(normalizedUrl)) return null;
